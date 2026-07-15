@@ -1,0 +1,15 @@
+term_it,variants_it,term_en,variants_en,category,in_claims,rationale,status,flag
+apparecchiatura,apparecchiatura,apparatus,apparatus,part,yes,"Claimed subject-matter (1); preamble noun of the apparatus claims.",locked,
+vasca di estrazione,vasca di estrazione,extraction tank,extraction tank,part,yes,"Main vessel (2), central feature of claim 1.",locked,
+serbatoio,serbatoio,tank,tank,part,no,"Single description occurrence at numeral (2); a second surface name for the extraction tank.",locked,"Numeral (2) is also named 'vasca di estrazione'; deliberate source inconsistency surfaced by numeral_term_consistency."
+gruppo filtrante,gruppo filtrante,filter assembly,filter assembly,part,yes,Filtering unit (3) housed inside the extraction tank.,locked,
+supporto,supporto,support,support,part,no,Removable support (3a) of the filter assembly.,locked,
+pompa di ricircolo,pompa di ricircolo,recirculation pump,recirculation pump,part,yes,Pump (4) circulating water through the filter assembly.,locked,
+unità di controllo,unità di controllo,control unit,control unit,part,yes,Controller (5) regulating temperature and operating pressure.,locked,
+sensore di temperatura,sensore di temperatura,temperature sensor,temperature sensor,part,no,Sensor (6) of the control unit; description only.,locked,
+temporizzatore,temporizzatore,timer,timer,part,no,Timer (7) of the control unit; description only.,locked,
+sensore di pressione,sensore di pressione,pressure sensor,pressure sensor,part,yes,Sensor (8) recited in claim 5.,locked,"Recited only in claim 5, never in the description: deliberate claim_support failure."
+rete metallica,rete metallica,metal mesh,metal mesh,part,yes,Metal mesh of the filter assembly recited in claim 3.,locked,
+estrazione a freddo,estrazione a freddo,cold extraction,cold extraction,process,yes,Core process of the invention; kept literal for the PCT register.,locked,
+caffè macinato,caffè macinato,ground coffee,ground coffee,material,yes,Feedstock recited in claims 1 and 6.,locked,
+acciaio inossidabile,acciaio inossidabile,stainless steel,stainless steel,material,yes,Tank material recited in claim 2.,locked,

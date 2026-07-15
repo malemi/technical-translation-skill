@@ -1,0 +1,12 @@
+# Client documents are confidential — never commit project data.
+projects/*
+!projects/_fixture/
+projects/_fixture/state/
+projects/_fixture/work/
+projects/_fixture/out/
+projects/_fixture/source.docx
+
+.env
+.venv/
+__pycache__/
+*.pyc
