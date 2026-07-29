@@ -1,0 +1,8 @@
+mode = leaf
+index_file = CLAUDE.md
+inventory_ignore =
+
+# build = .venv/bin/python .claude/skills/patent-translate/scripts/dev/smoke.py
+# There is no test runner. smoke.py IS the test: it runs the whole offline chain
+# on the fixtures and asserts the outcome at both ends (exit 0 = clean).
+# The three DeepL stages need a real DEEPL_AUTH_KEY and are not part of it.
