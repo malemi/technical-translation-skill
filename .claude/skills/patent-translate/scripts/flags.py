@@ -184,8 +184,10 @@ def main() -> int:
     p_add.add_argument("--project", required=True)
     p_add.add_argument("--class", dest="flag_class", required=True,
                        choices=FLAG_CLASSES)
-    p_add.add_argument("--segment", required=True,
-                       help="segment id the flag is about, e.g. C-01")
+    p_add.add_argument("--segment",
+                       help="segment id the flag is about, e.g. C-01; omit for a "
+                            "document-wide flag (segment_id is nullable in the schema, "
+                            "and checks.py already writes flags without one)")
     p_add.add_argument("--issue", required=True)
     p_add.add_argument("--text-it", dest="text_it")
     p_add.add_argument("--text-en", dest="text_en")

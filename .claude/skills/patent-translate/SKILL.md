@@ -59,7 +59,7 @@ Work from the repo root. `<P>` = project path, e.g. `projects/acme`.
 
 ### 2. Terminology (GATE — nothing is translated before the lock)
 - Author `<P>/terminology.csv` per CONTRACTS.md, term choices per
-  `references/claim-conventions.md`. Coverage order: claim terms first
+  `references/style-guide.md`. Coverage order: claim terms first
   (`in_claims=yes`), then every numeral-bearing part, then process, material
   and parameter terms.
 - Source inconsistency (two IT terms, same part/numeral): keep ONE row — all
@@ -83,7 +83,7 @@ Work from the repo root. `<P>` = project path, e.g. `projects/acme`.
 
 ### 5. Title and claims (yours)
 - Title → `translations.json` `title.text_en`.
-- Each claim per `references/claim-conventions.md`, locked terms verbatim,
+- Each claim per `references/style-guide.md`, locked terms verbatim,
   into `state/claims_en.json` with its `conventions` list.
 
 ### 6. Back-translation probe
