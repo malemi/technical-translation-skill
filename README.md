@@ -200,6 +200,7 @@ All scripts run from the repo root; `--project` takes a path like
 | `glossary.py` | `validate --project P` \| `push --project P` |
 | `translate_deepl.py` | `run --project P [--target EN-US]` |
 | `backtranslate.py` | `run --project P` |
+| `set_final.py` | `--project P --input revisions.json [--dry-run]` |
 | `checks.py` | `run --project P` |
 | `flags.py` | `add --project P --class TERM --segment C-01 --issue "…"` \| `resolve --project P --key <k> --resolution "…"` \| `list --project P [--open]` |
 | `assemble.py` | `run --project P` |

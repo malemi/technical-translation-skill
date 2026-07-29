@@ -78,11 +78,18 @@ Work from the repo root. `<P>` = project path, e.g. `projects/acme`.
 
 ### 4. Fidelity review (yours)
 - Per `references/review-protocol.md`: EVERY pair, in order, IT vs
-  `text_en_deepl`. Edits go to `text_en_final` with a reasoned `edits` entry.
-  New source ambiguities discovered here → flags.
+  `text_en_deepl`. New source ambiguities discovered here → flags.
+- Never hand-edit the state files. Write a revisions JSON and apply it with
+  `.venv/bin/python $S/set_final.py --project <P> --input <file>`: it is the
+  single writer, it records a reason for every change, and it is idempotent, so
+  a re-run of the same batch reports "already current" instead of duplicating.
+  `--dry-run` first on a large batch.
 
 ### 5. Title and claims (yours)
-- Title → `translations.json` `title.text_en`.
+- Title and claims go through the same tool: `title`, `pairs` and `claims`
+  sections of the revisions file. Claims are supplied as `parts_en`; `text_en`
+  is rebuilt keeping whatever claim-number prefix and part separator the
+  project already uses.
 - Each claim per `references/style-guide.md`, locked terms verbatim,
   into `state/claims_en.json` with its `conventions` list.
 
