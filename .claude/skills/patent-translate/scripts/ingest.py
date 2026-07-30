@@ -48,8 +48,12 @@ def is_subheading(norm: str) -> bool:
 
 
 class Ingestor:
-    def __init__(self, paragraphs):
+    def __init__(self, paragraphs, paragraph_numbers=None):
         self.paragraphs = paragraphs
+        # Word-rendered list labels by body-paragraph index. A literal "[0001]"
+        # typed into the text still wins; this covers the far commoner case of
+        # automatic numbering, which is invisible in the paragraph text.
+        self.paragraph_numbers = paragraph_numbers or {}
         self.segments: list[dict] = []
         self.claims: list[dict] = []
         self.claim_texts: dict[str, str] = {}
@@ -66,6 +70,12 @@ class Ingestor:
     def add_segment(self, kind: str, section: str, indices: list[int],
                     style: str, text: str, parts=None) -> dict:
         m = PARA_NUMBER_RE.match(text) if kind != "claim" else None
+        if m is not None:
+            para_number = m.group(1)
+        elif kind == "claim":
+            para_number = None
+        else:
+            para_number = self.paragraph_numbers.get(indices[0]) if indices else None
         segment = {
             "id": self.next_id(KIND_PREFIX[kind]),
             "kind": kind,
@@ -73,7 +83,7 @@ class Ingestor:
             "docx_indices": indices,
             "style": style,
             "text_it": text,
-            "para_number": m.group(1) if m else None,
+            "para_number": para_number,
             "parts_it": parts,
         }
         self.segments.append(segment)
@@ -288,8 +298,11 @@ def main() -> int:
 
     paths = common.project_paths(args.project, source=args.source)
     paragraphs = common.iter_body_paragraphs(paths["source"])
+    paragraph_numbers, numbering_warnings = common.iter_paragraph_numbers(paths["source"])
 
-    ingestor = Ingestor(paragraphs)
+    ingestor = Ingestor(paragraphs, paragraph_numbers)
+    for message in numbering_warnings:
+        ingestor.warn(message)
     ingestor.run()
     numerals = ingestor.numerals()
 

@@ -73,6 +73,32 @@ dropping one row makes smoke exit 1. The first version of that assertion checked
 only that the file existed, which a stale file passes — and a second version
 failed on the two section markers that carry no English by design.
 
+**The filing was missing every paragraph number, and now is not.** Mario caught
+it on the delivered `.docx`: the source numbers its description paragraphs
+`[0001]`…`[00101]` and the English had none. The cause was not in `assemble.py`
+— `ingest.py` looked for a literal `[dddd]` at the start of the paragraph text,
+while the source uses **Word's automatic list numbering**, which
+`paragraph.text` does not return. `para_number` was therefore null on all 138
+segments and had been for every run of this project.
+
+`common.iter_paragraph_numbers` now renders the label from the numbering
+definition (`numId` → `abstractNum` level 0, `numFmt` + `lvlText`, counted from
+`start`), `ingest.py` uses it with the literal marker still winning when present,
+and `assemble.py` writes it into the filing as literal text so nothing renumbers
+it downstream. Only `decimal` and `decimalZero` are rendered; anything else warns
+and yields null, because a wrong paragraph number is worse than a missing one.
+
+Verified against reality, not against intent: LibreOffice's own rendering of the
+source was used as the oracle, giving `[0001]`…`[0099]`, `[00100]`, `[00101]` —
+the odd five-digit tail is what the applicant's numbering definition actually
+produces, and it is reproduced rather than corrected. Re-ingesting cafe124
+changed nothing but `para_number` (diffed field by field, so no translation was
+orphaned), the check profile held at 10-3-0, and the rebuilt filing carries 101
+numbers in state order. `make_fixture.py` now gives the fixture real Word
+numbering, and smoke asserts the whole chain — resolved at ingest, carried in
+state, rendered into the filing. Both halves have teeth: reinstating the original
+bug in `ingest.py` fails smoke, and so does removing the render in `assemble.py`.
+
 **Source defects were not touched.** All sixteen are translated as filed and
 listed in `notes-for-human-reviewer.md`, in two tiers, in plain prose with no
 internal ids. One deliberate consequence: the specific-extraction-energy sentence

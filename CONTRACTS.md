@@ -130,8 +130,20 @@ Rules:
 - Claim segments: `parts_it` = list of the raw paragraph texts composing the
   claim (first part contains the claim number prefix); `text_it` = parts joined
   with a single `\n`.
-- `para_number`: official numbering like `[0012]` if the paragraph text starts
-  with it, else null (the marker stays inside text_it as-is).
+- `para_number`: the paragraph's official number, like `[0012]`, from either
+  source — a literal marker typed at the start of the text, which wins and stays
+  inside `text_it` as-is; or Word's automatic list numbering, which does not
+  appear in the paragraph text at all and is rendered from the numbering
+  definition (`numId` → `abstractNum` level 0: `numFmt` + `lvlText`, counted from
+  `start`). `decimal` and `decimalZero` are rendered; any other format, or a
+  level other than 0, yields null and an ingest warning rather than a guessed
+  number. Null for claims and for unnumbered paragraphs.
+
+  Automatic numbering is the normal case in Italian applications and is invisible
+  to `paragraph.text`, so a document can lose every paragraph number with nothing
+  objecting — `assemble.py` writes `para_number` into `filing_en.docx` as literal
+  text, and `dev/smoke.py` asserts the chain end to end on a fixture that carries
+  real Word numbering.
 
 Section detection:
 - A paragraph whose normalized upper-cased text matches one of these lexicons

@@ -595,14 +595,12 @@ def assert_deliverables() -> None:
     # Existence alone is not an assertion: a stale file left by an earlier run
     # passes it. Read bilingual.csv back and check it against the state it is
     # supposed to have been built from.
-    import csv as _csv
-
     segments = json.loads(
         (Path(FIXTURE) / "state" / "segments.json").read_text(encoding="utf-8")
     )["segments"]
     bilingual = Path(FIXTURE) / "out" / "bilingual.csv"
     with open(bilingual, encoding="utf-8-sig", newline="") as fh:
-        rows = list(_csv.reader(fh))
+        rows = list(csv.reader(fh))
     if rows[0] != ["id", "kind", "section", "italiano", "english"]:
         raise Failure(f"bilingual.csv header is {rows[0]}")
     if len(rows) - 1 != len(segments):
@@ -621,6 +619,37 @@ def assert_deliverables() -> None:
 
     print(f"OK: {len(DELIVERABLES)} deliverables written to {FIXTURE}/out, "
           f"bilingual.csv = {len(segments)} segments in document order")
+
+    # Paragraph numbers. The fixture numbers its description paragraphs with
+    # Word's automatic numbering, exactly as a real application does, so the
+    # digits live in the numbering definition and never in the paragraph text.
+    # Assert the whole chain: resolved at ingest, carried in state, rendered
+    # into the filing in order. This is the path on which a real document's 101
+    # paragraph numbers were silently dropped.
+    numbered = [s for s in segments if s["para_number"] is not None]
+    if not numbered:
+        raise Failure("no segment carries a para_number: the fixture stopped "
+                      "exercising Word list numbering")
+    expected = [s["para_number"] for s in numbered]
+    if expected != [f"[00{i:02d}]" for i in range(1, len(expected) + 1)]:
+        raise Failure(f"fixture paragraph numbers are not [0001]…: {expected}")
+    if any(s["kind"] != "description" for s in numbered):
+        raise Failure("a non-description segment carries a paragraph number")
+
+    from docx import Document  # local: python-docx is only needed for this check
+
+    filing = Document(str(Path(FIXTURE) / "out" / "filing_en.docx"))
+    in_filing = [
+        m.group(1)
+        for m in (re.match(r"^(\[0\d+\])\s", p.text) for p in filing.paragraphs)
+        if m
+    ]
+    if in_filing != expected:
+        raise Failure(
+            f"filing_en.docx paragraph numbers {in_filing} != state {expected}"
+        )
+    print(f"OK: {len(expected)} paragraph numbers resolved from Word numbering "
+          f"and rendered into the filing, {expected[0]}–{expected[-1]}")
 
 
 NOTES_FOR_REVIEWER = "notes-for-human-reviewer.md"

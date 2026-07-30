@@ -141,6 +141,109 @@ def iter_body_paragraphs(docx_path) -> list[tuple[int, str, str]]:
 
 
 # --------------------------------------------------------------------------
+# Word list numbering (paragraph numbers)
+
+# Italian patent applications number their description paragraphs [0001],
+# [0002], … and they do it with Word's automatic list numbering, not by typing
+# the digits. python-docx's `paragraph.text` returns the run text only, so the
+# label is invisible to any reader of the text — which is how a whole document's
+# paragraph numbers can go missing without a single check firing.
+#
+# We render the label ourselves from the numbering definition. Only what real
+# documents use is supported; anything else is reported rather than guessed at,
+# because a wrong paragraph number is worse than an absent one.
+_NUM_FMT_RENDER = {
+    "decimal": lambda n: str(n),
+    "decimalZero": lambda n: f"{n:02d}",
+}
+
+
+def iter_paragraph_numbers(docx_path) -> tuple[dict[int, str], list[str]]:
+    """Map body-paragraph index -> rendered list label (e.g. "[0001]").
+
+    Returns (labels, warnings). Paragraphs with no numbering are absent from
+    the map. A numbering construct we cannot render faithfully produces a
+    warning and no label, never an invented one.
+    """
+    from docx import Document
+    from docx.oxml.ns import qn
+
+    docx_path = Path(docx_path)
+    if not docx_path.is_file():
+        die(f"docx file not found: {docx_path}")
+    doc = Document(str(docx_path))
+
+    try:
+        numbering = doc.part.numbering_part.element
+    except (KeyError, NotImplementedError, AttributeError):
+        return {}, []  # no numbering part: nothing in this document is numbered
+
+    warnings: list[str] = []
+
+    # numId -> abstractNumId, noting any start override we do not honour.
+    num_to_abstract: dict[str, str] = {}
+    for num in numbering.findall(qn("w:num")):
+        num_id = num.get(qn("w:numId"))
+        abstract = num.find(qn("w:abstractNumId"))
+        if abstract is None:
+            continue
+        num_to_abstract[num_id] = abstract.get(qn("w:val"))
+        if num.find(qn("w:lvlOverride")) is not None:
+            warnings.append(
+                f"numbering numId={num_id} carries a level override, which is "
+                "not applied: check the rendered paragraph numbers by hand"
+            )
+
+    # abstractNumId -> level 0 definition.
+    levels: dict[str, dict] = {}
+    for abstract_num in numbering.findall(qn("w:abstractNum")):
+        abstract_id = abstract_num.get(qn("w:abstractNumId"))
+        for lvl in abstract_num.findall(qn("w:lvl")):
+            if lvl.get(qn("w:ilvl")) != "0":
+                continue
+            fmt = lvl.find(qn("w:numFmt"))
+            text = lvl.find(qn("w:lvlText"))
+            start = lvl.find(qn("w:start"))
+            levels[abstract_id] = {
+                "fmt": fmt.get(qn("w:val")) if fmt is not None else None,
+                "text": text.get(qn("w:val")) if text is not None else None,
+                "start": int(start.get(qn("w:val"))) if start is not None else 1,
+            }
+
+    labels: dict[int, str] = {}
+    counters: dict[str, int] = {}
+    unrenderable: set[str] = set()
+    for index, para in enumerate(doc.paragraphs):
+        p_pr = para._p.find(qn("w:pPr"))
+        num_pr = p_pr.find(qn("w:numPr")) if p_pr is not None else None
+        if num_pr is None:
+            continue
+        num_id_el = num_pr.find(qn("w:numId"))
+        ilvl_el = num_pr.find(qn("w:ilvl"))
+        if num_id_el is None:
+            continue
+        num_id = num_id_el.get(qn("w:numId")) or num_id_el.get(qn("w:val"))
+        ilvl = ilvl_el.get(qn("w:val")) if ilvl_el is not None else "0"
+        if ilvl != "0":
+            unrenderable.add(f"numId={num_id} level {ilvl} (only level 0 is rendered)")
+            continue
+        level = levels.get(num_to_abstract.get(num_id, ""))
+        if level is None or level["text"] is None:
+            unrenderable.add(f"numId={num_id} has no level 0 definition")
+            continue
+        render = _NUM_FMT_RENDER.get(level["fmt"])
+        if render is None:
+            unrenderable.add(f"numId={num_id} uses numFmt={level['fmt']!r}")
+            continue
+        counters[num_id] = counters.get(num_id, level["start"] - 1) + 1
+        labels[index] = level["text"].replace("%1", render(counters[num_id]))
+
+    for item in sorted(unrenderable):
+        warnings.append(f"paragraph numbering not rendered: {item}")
+    return labels, warnings
+
+
+# --------------------------------------------------------------------------
 # reference numerals
 
 # A reference sign is a parenthesized numeric sign ("100", "3a") OR an

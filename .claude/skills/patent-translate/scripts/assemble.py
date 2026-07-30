@@ -162,7 +162,13 @@ def build_filing(state: dict, english_for, out_path) -> int:
         if segment["kind"] == "heading":
             doc.add_paragraph(text, style="Heading 2")
         else:
-            doc.add_paragraph(text, style="Normal")
+            # The source numbers its description paragraphs ([0001], [0002], …)
+            # and the filing has to carry the same numbers: they are how the
+            # claims, the search report and every later amendment refer to the
+            # text. Written as literal text, not as Word numbering, so nothing
+            # renumbers them downstream.
+            number = segment.get("para_number")
+            doc.add_paragraph(f"{number} {text}" if number else text, style="Normal")
 
     # Claims.
     doc.add_paragraph("CLAIMS", style="Heading 2")

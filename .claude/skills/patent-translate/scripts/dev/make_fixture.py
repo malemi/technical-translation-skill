@@ -64,11 +64,68 @@ def build_paragraphs() -> list[str]:
     return paragraphs
 
 
+def add_patent_numbering(doc):
+    """Number the description paragraphs the way a real application does.
+
+    Italian applications write [0001], [0002], … with Word's automatic list
+    numbering, so the digits are in the numbering definition and NOT in the
+    paragraph text. Reproducing that here is the point: a fixture whose numbers
+    are typed as text would exercise nothing, and this is precisely the path on
+    which a whole document's paragraph numbers once went missing unnoticed.
+
+    Returns the labels the numbering renders, in document order.
+    """
+    from docx.oxml import parse_xml
+    from docx.oxml.ns import nsdecls, qn
+
+    numbering = doc.part.numbering_part.element
+    abstract_id = str(
+        max((int(a.get(qn("w:abstractNumId"))) for a in numbering.findall(qn("w:abstractNum"))),
+            default=-1) + 1
+    )
+    num_id = str(
+        max((int(n.get(qn("w:numId"))) for n in numbering.findall(qn("w:num"))), default=0) + 1
+    )
+    numbering.append(parse_xml(
+        f'<w:abstractNum {nsdecls("w")} w:abstractNumId="{abstract_id}">'
+        f'<w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimalZero"/>'
+        f'<w:lvlText w:val="[00%1]"/><w:lvlJc w:val="left"/></w:lvl></w:abstractNum>'
+    ))
+    numbering.append(parse_xml(
+        f'<w:num {nsdecls("w")} w:numId="{num_id}">'
+        f'<w:abstractNumId w:val="{abstract_id}"/></w:num>'
+    ))
+
+    numbered = set(description_body_lines())
+    labels = []
+    for para in doc.paragraphs:
+        if para.text.strip() not in numbered:
+            continue
+        para._p.get_or_add_pPr().append(parse_xml(
+            f'<w:numPr {nsdecls("w")}><w:ilvl w:val="0"/>'
+            f'<w:numId w:val="{num_id}"/></w:numPr>'
+        ))
+        labels.append(f"[00{len(labels) + 1:02d}]")
+    return labels
+
+
+def description_body_lines() -> list[str]:
+    """The description's prose paragraphs — everything between the DESCRIZIONE
+    and RIVENDICAZIONI markers that is not itself an all-caps sub-heading."""
+    start = TEXT_LINES.index("DESCRIZIONE") + 1
+    end = TEXT_LINES.index("RIVENDICAZIONI")
+    return [
+        line for line in TEXT_LINES[start:end]
+        if not (line == line.upper() and not line.endswith("."))
+    ]
+
+
 def main() -> int:
     paragraphs = build_paragraphs()
     doc = Document()
     for text in paragraphs:
         doc.add_paragraph(text)
+    labels = add_patent_numbering(doc)
 
     props = doc.core_properties
     fixed = datetime(2026, 1, 1, tzinfo=timezone.utc)
@@ -90,8 +147,25 @@ def main() -> int:
             f"({len(reopened)} vs {len(paragraphs)})"
         )
 
+    # self-check: the numbering we wrote must render to the labels we intended,
+    # read back through the same resolver ingest.py uses.
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    import common
+
+    rendered, warnings = common.iter_paragraph_numbers(OUT_PATH)
+    if warnings:
+        raise SystemExit("ERROR: numbering warnings on the fixture: " + "; ".join(warnings))
+    if list(rendered.values()) != labels:
+        raise SystemExit(
+            f"ERROR: rendered paragraph numbers {list(rendered.values())} "
+            f"!= intended {labels}"
+        )
+
     non_empty = sum(1 for p in paragraphs if p)
-    print(f"wrote {OUT_PATH}: {len(paragraphs)} paragraphs ({non_empty} non-empty)")
+    print(f"wrote {OUT_PATH}: {len(paragraphs)} paragraphs ({non_empty} non-empty), "
+          f"{len(labels)} numbered {labels[0]}–{labels[-1]}")
     return 0
 
 
