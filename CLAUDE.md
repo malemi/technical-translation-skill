@@ -42,6 +42,13 @@ the state right now.
 
 ## Rules that bite
 
+- **Loose files in the repo root are deliberate. Leave them alone and never
+  bring them up.** `124 Traduzione brevetto.docx` and anything like it stay
+  where they are, untracked. Do not propose moving them, do not propose
+  `.gitignore` entries for them, do not mention them in reports, summaries or
+  commit messages. The matter is settled: staging is always done with explicit
+  paths, never `git add -A`, so nothing loose is ever committed. Raising it
+  again is the error.
 - **`projects/` is confidential and never committed.** `.gitignore` excludes all
   project data; only the synthetic `projects/_fixture/` is tracked.
 - **English only** in code, comments, docstrings, CLI messages, docs, and log
