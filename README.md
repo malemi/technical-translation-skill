@@ -2,90 +2,71 @@
 
 **Italian patent application in, English patent application out, ready to file.**
 
-You also get a bilingual document showing every choice and every open doubt,
-segment by segment. Drop the Italian `.docx` in a folder, ask Claude to
-translate it, answer its questions.
+With it comes a bilingual document, paragraph by paragraph, marking every choice
+made and every doubt left open — so you can check the work without collating the
+two texts yourself.
 
-## What you get
+## Using it
 
-In `projects/<your-job>/out/`:
+No terminal. Install the **Claude Code desktop app** (Mac or Windows) once —
+someone technical can do that for you in ten minutes. Then, for each job:
 
-| File | What it is |
-| --- | --- |
-| `filing_en.docx` | The English application. This is the deliverable. |
-| `side_by_side.docx` | Italian and English side by side, with the open flags. This is what you review. |
-| `ESCALATIONS.md` | The questions Claude could not answer from the source. You answer these. |
-| `notes-for-human-reviewer.md` | For the human editor: what we chose, what we are unsure of, what looks wrong in the Italian. |
-| `audit_numbers.csv` | Every number and unit, Italian vs English. |
-| `bilingual.csv` | The pairs as a flat table, for sorting and diffing outside Word. |
-| `terminology.csv` | The glossary that was used. |
+1. Put the Italian application in its own folder, one Word file per folder.
+2. Type one sentence: *translate the application in projects/rossi*.
+3. **Approve the terminology.** It reads the whole document, lists every term it
+   intends to use with its English rendering, and stops. Nothing is translated
+   until you agree. This is where you shape the result.
+4. Read what comes back, and answer its questions.
+5. Ask for a second opinion when you want one — an independent review of the
+   finished translation.
 
-## How it works
+## What comes back
 
-DeepL with a locked glossary translates the description, because it stays
-consistent across a long document. Claude writes the claims, because those need
-a conversion DeepL cannot do. Thirteen mechanical checks then verify the
-result — reference signs, numbers, the dependency graph, abstract length, and
-the rest — and every failure becomes a flag next to the text it is about.
+- **The English application** — title, description, claims, abstract, in Word.
+- **The bilingual document** — Italian and English side by side, with each open
+  doubt on the row it belongs to.
+- **The questions** — only what cannot be decided from the Italian alone.
+- **A note for your editor** — what was rendered how, what we were unsure of,
+  and what we suspect is wrong in the Italian itself.
+- **A numbers check** — every number and unit, Italian against English.
 
-A second skill, `patent-review`, then reviews the finished job **blind**: it
-sees the Italian, the English, the style guide and the locked terms, and none
-of the pipeline's own doubts. A reviewer who has seen the flags confirms
-instead of discovering, so blindness is built into the packet it reads rather
-than asked for. It proposes; it never edits.
+## Why you can trust it
 
-## Why it is built this way
+**The Italian is authoritative and is never improved.** A missing antecedent, a
+dangling clause, a formula that does not parse — translated exactly as they
+stand and reported to you, never quietly repaired. A translation that fixes the
+source has produced a different application.
 
-**The Italian is authoritative and is never improved.** A badly drafted claim is
-translated faithfully and flagged, not fixed. Ambiguities become questions, not
-silent decisions — which is why the job ends with a list you have to answer.
+**An ambiguity becomes a question, never a silent decision.** That is why a job
+ends with a list of questions rather than a confident text.
 
-Every normative rule is cited to its article or rule number and read on the
-primary text: [the sources](.claude/skills/patent-translate/references/review_sources.json),
-with the rules themselves in
-[the style guide](.claude/skills/patent-translate/references/style-guide.md).
+**Every rule it follows is cited by number**, from the PCT, its Regulations, the
+EPC or the EPO Guidelines, read on the official text. They are all in the
+[style guide](.claude/skills/patent-translate/references/style-guide.md); the
+[source list](.claude/skills/patent-translate/references/review_sources.json)
+gives each URL and edition, re-checked on every job.
 
-**Which DeepL tier you use is a confidentiality decision, not a cost decision.**
-Free retains submitted text and may train on it; Pro does not. Use Free only
-once the priority application is filed. `projects/` and `.env` are never
-committed, and DeepL is the only external service.
+**What can be checked mechanically, is** — reference signs, numbers and units,
+the claim dependency graph, one sentence per claim, claim terms supported in the
+description, abstract length. Thirteen checks, every time.
 
-## Try it
+**The second review is blind.** The reviewer is shown the Italian, the English
+and the rules, and deliberately not the first pass's doubts — someone who has
+seen them confirms instead of finding. It proposes; it never edits. On the first
+real job it caught a formula that had lost its divisor, and a claim whose
+article had been silently changed.
 
-No DeepL account, no network, no real document — the repo ships a synthetic
-Italian patent and a canned English side:
+## Confidentiality
 
-```
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python .claude/skills/patent-translate/scripts/dev/smoke.py
-```
+Only the description prose is sent to DeepL. Nothing else leaves the machine,
+and client documents are never kept in this project's shared history.
 
-`SMOKE OK` and exit 0 means the whole chain works, seeded defects and all. The
-clean fixture reports one failure and one warning on purpose: the *Italian* has
-deliberate defects the pipeline must surface rather than quietly fix.
+**Which DeepL account you use is a confidentiality decision, not a cost one.**
+The free tier keeps what it receives and may train on it; the paid tier does
+not. Free is for text already destined to be published — after the priority
+filing. An unfiled application needs a paid account.
 
-## On a real patent
+---
 
-Put `DEEPL_AUTH_KEY` in the environment or a git-ignored `.env`, then:
-
-1. `mkdir -p projects/acme && cp ~/domanda.docx projects/acme/`
-2. Ask Claude, in plain words: `traduci projects/acme`.
-3. **It stops and waits for you.** Nothing is translated until you approve the
-   glossary — DeepL is only consistent if the terminology is fixed up front.
-4. Review `side_by_side.docx`, answer `ESCALATIONS.md`. For a second opinion,
-   ask for a review of the job.
-
-## Where to look next
-
-- [`CLAUDE.md`](CLAUDE.md) — the index a Claude Code session starts from.
-- [`CONTRACTS.md`](CONTRACTS.md) — every schema, check and policy. Wins over prose.
-- [`docs/`](docs/README.md) — current state, known issues, quality grades.
-- [`style-guide.md`](.claude/skills/patent-translate/references/style-guide.md) —
-  the single style authority, and its `## Sources`.
-- [`review_sources.json`](.claude/skills/patent-translate/references/review_sources.json) —
-  the 11 primary sources with URLs and editions, checked each run.
-- The two procedures: [`patent-translate`](.claude/skills/patent-translate/SKILL.md),
-  [`patent-review`](.claude/skills/patent-review/SKILL.md).
-
-This repo follows the conventions of the **mrcall AI kit**
-(<https://github.com/hahnbanach/mrcall-ai-kit>).
+Building on it, or reviewing the code? Start from [`CLAUDE.md`](CLAUDE.md).
+Conventions: **[mrcall AI kit](https://github.com/hahnbanach/mrcall-ai-kit)**.
