@@ -470,6 +470,11 @@ Outputs in `<project>/out/`:
 - `ESCALATIONS.md` — open flags of class AMBIGUITY, TERM, CLAIM-DEFECT, MECH,
   grouped by class, each with segment id, IT text, EN text, issue, options.
 - `audit_numbers.csv` — the numbers audit table.
+- `bilingual.csv` — one row per segment in document order, columns
+  `id, kind, section, italiano, english`, UTF-8 with a BOM so Excel reads the
+  accents on a double click. Same rows and same English index as
+  `side_by_side.docx`, without the flags column or the appendices. `assemble.py`
+  dies if its row count does not equal the segment count.
 - `terminology.csv` — copy of the project's file.
 - `notes-for-human-reviewer.md` — copied from `<project>/` when that file
   exists; deleted from `out/` when it does not, so a stale copy cannot outlive

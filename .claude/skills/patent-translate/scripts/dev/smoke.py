@@ -99,6 +99,7 @@ DELIVERABLES = (
     "ESCALATIONS.md",
     "audit_numbers.csv",
     "terminology.csv",
+    "bilingual.csv",
 )
 
 # --------------------------------------------------------------------------
@@ -590,7 +591,36 @@ def assert_deliverables() -> None:
     ]
     if missing:
         raise Failure(f"missing deliverables in {FIXTURE}/out: {', '.join(missing)}")
-    print(f"OK: {len(DELIVERABLES)} deliverables written to {FIXTURE}/out")
+
+    # Existence alone is not an assertion: a stale file left by an earlier run
+    # passes it. Read bilingual.csv back and check it against the state it is
+    # supposed to have been built from.
+    import csv as _csv
+
+    segments = json.loads(
+        (Path(FIXTURE) / "state" / "segments.json").read_text(encoding="utf-8")
+    )["segments"]
+    bilingual = Path(FIXTURE) / "out" / "bilingual.csv"
+    with open(bilingual, encoding="utf-8-sig", newline="") as fh:
+        rows = list(_csv.reader(fh))
+    if rows[0] != ["id", "kind", "section", "italiano", "english"]:
+        raise Failure(f"bilingual.csv header is {rows[0]}")
+    if len(rows) - 1 != len(segments):
+        raise Failure(
+            f"bilingual.csv has {len(rows) - 1} rows, expected {len(segments)}"
+        )
+    if [r[0] for r in rows[1:]] != [s["id"] for s in segments]:
+        raise Failure("bilingual.csv rows are not the segments in document order")
+    # Section markers (TITOLO, RIVENDICAZIONI) carry no English by design and are
+    # the only rows allowed to be empty; every translated segment must have text.
+    empty = [r[0] for r in rows[1:] if r[1] != "heading" and not r[4].strip()]
+    if empty:
+        raise Failure("bilingual.csv has empty English on: " + ", ".join(empty))
+    if bilingual.read_bytes()[:3] != b"\xef\xbb\xbf":
+        raise Failure("bilingual.csv has no UTF-8 BOM; Excel will mangle the accents")
+
+    print(f"OK: {len(DELIVERABLES)} deliverables written to {FIXTURE}/out, "
+          f"bilingual.csv = {len(segments)} segments in document order")
 
 
 NOTES_FOR_REVIEWER = "notes-for-human-reviewer.md"

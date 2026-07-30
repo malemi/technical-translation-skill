@@ -19,8 +19,9 @@ Everything lands in `projects/<your-job>/out/`:
 | `side_by_side.docx` | Italian and English in two columns, one row per segment, with the open flags on each row. This is what you review. |
 | `ESCALATIONS.md` | The questions Claude could not answer from the source alone, grouped by kind. You are expected to answer these. |
 | `audit_numbers.csv` | Every number and unit in the document, Italian vs English, so you can verify nothing drifted. |
+| `bilingual.csv` | The same pairs as a flat table, for sorting, filtering and diffing outside Word. |
 | `terminology.csv` | The agreed glossary that was used. |
-| `notes-for-human-reviewer.md` | How a couple of dozen expressions were rendered — the Italian, the English, nothing else. |
+| `notes-for-human-reviewer.md` | What a human editor is told: how expressions were rendered, the choices we are unsure of, and what we suspect is wrong in the Italian. |
 
 ## How it works
 

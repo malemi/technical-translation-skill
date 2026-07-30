@@ -1,5 +1,5 @@
 ---
-status: planned
+status: in-progress
 created: 2026-07-30
 ---
 
@@ -166,6 +166,16 @@ tracked under `dev/`.
     `assemble.py`: how a couple of dozen expressions were rendered, Italian and
     English, **no reasons**. A stale `out/` copy is deleted when the project file
     goes away.
+
+    **Amended 2026-07-30, by Mario, when the file met its actual reader.** The
+    "no reasons" rule was aimed at the conventions-disclosure apparatus, and it
+    cut too far: an editor handed a bare rendering table cannot tell a house
+    choice from a decision they should overturn. The file now has three sections
+    — the renderings, the choices we are unsure of *and why*, and what we suspect
+    is wrong in the Italian — with the register set explicitly: human to human,
+    not over-confident, addressed to a professional translator who knows more
+    than we do. What stays excluded is unchanged: internal ids, the flag
+    taxonomy, rule-lawyering, and any request to confirm our own work.
   - **CONVENTION is one flag per RULE, never per occurrence**, and it reaches no
     deliverable: out of the review table, out of `ESCALATIONS.md`, and the
     "Applied conventions" appendix is gone. On cafe124 that removed 18 rows of
@@ -195,10 +205,24 @@ tracked under `dev/`.
 
 ### Phase 4 — first real run + docs
 
-- [ ] **10. Review cafe124.** Build the packet, read it, write `REVIEW.md`, show
-  Mario the notes. Accepted corrections go in through `set_final.py`, then
-  `checks.py` and `assemble.py` re-run, and the check profile is compared with
-  the 10-3-0 baseline.
+- [x] **10. Review cafe124.** Done 2026-07-30, under a filing deadline. Packet:
+  137 entries. Read by seven fresh-context subagents — five contiguous
+  description blocks balanced by character count, one for title + claims +
+  abstract as one set, one document-wide consistency pass over all 137 segments.
+  `review/REVIEW.md` carries 51 notes numbered N1–N51; the orchestrator verified
+  the seven highest-impact ones against the packet text itself before writing
+  them up. 37 corrections applied through `set_final.py`, `checks.py` and
+  `assemble.py` re-run: **10 pass, 3 warn, 0 fail, +0 new MECH flags**, identical
+  to the 10-3-0 baseline. The produced `filing_en.docx` was reopened and asserted
+  from the inside rather than trusted from the script's report.
+
+  Two things to carry forward. **The seventh shard earns its place**: term drift
+  between sections is invisible to a block reader, and it is what surfaced `in
+  cui` rendered `wherein` in 19 claims and `in which` in the 20th. **The `state/`
+  digest was never re-verified** before edits began — see the acceptance criteria
+  below; `state_sha256` was printed at packet build and then the evidence was
+  overwritten by the first legitimate write. Run `state-digest` at the close of
+  the blind phase next time.
 - [x] **11. Root `README.md` rewrite.** Concise and high-level only: what the
   repo does, how it works, why it is built that way. No technical information
   that does not serve high-level understanding. Target structure:
@@ -232,7 +256,11 @@ tracked under `dev/`.
 - Seeded recall 8/8 classes; false positives individually analysed with Mario;
   source-quirk recall reported.
 - cafe124 `REVIEW.md` produced; every dismissal cites its funnel question; the
-  `state/` hash is unchanged across the blind phase.
+  `state/` hash is unchanged across the blind phase. **Partially met**: the
+  `REVIEW.md` exists and the dismissal criterion is moot after 9c cut the
+  structured findings step, but the `state/` hash was captured at packet build
+  and never re-verified before the first edit, so that half is unproven rather
+  than satisfied.
 - Root `README.md` reads as what/how/why at high level: no script tables, no
   layout tree; the Confidentiality section survives and the `CLAUDE.md` pointer
   to it still resolves.

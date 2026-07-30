@@ -9,6 +9,7 @@ and writes, into <project>/out/:
   side_by_side.docx   landscape bilingual review table + audit appendices
   ESCALATIONS.md      open non-convention flags, grouped by class
   audit_numbers.csv   the numbers-and-units audit table (checks data)
+  bilingual.csv       the bilingual pairs as a flat sortable table
   terminology.csv     a copy of the project's glossary
   notes-for-human-reviewer.md   copied from the project when it exists: how a
                       handful of expressions were rendered, and nothing else
@@ -398,6 +399,35 @@ def build_escalations_md(state: dict, out_path) -> None:
     out_path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def build_bilingual_csv(state: dict, english_for, out_path) -> int:
+    """The bilingual pairs as a flat table, one row per segment, document order.
+
+    Same rows as side_by_side.docx and built from the same English index, so the
+    two cannot disagree; what it drops is the flags column and the appendices.
+    It exists because a reviewer who wants to sort, filter or diff the pairs
+    cannot do any of that inside a Word table.
+
+    UTF-8 with a BOM: without it Excel reads the file as the local codepage on
+    a double click and every Italian accent arrives broken.
+    """
+    with open(out_path, "w", encoding="utf-8-sig", newline="") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(["id", "kind", "section", "italiano", "english"])
+        rows = 0
+        for segment in state["segments"]["segments"]:
+            writer.writerow(
+                [
+                    segment["id"],
+                    segment["kind"],
+                    segment["section"],
+                    segment["text_it"],
+                    english_for(segment),
+                ]
+            )
+            rows += 1
+    return rows
+
+
 def build_audit_csv(state: dict, out_path) -> None:
     numbers = _check_data(state["checks"], "numbers_units") or []
     with open(out_path, "w", encoding="utf-8", newline="") as fh:
@@ -497,19 +527,27 @@ def run(args) -> int:
     escalations_path = paths["out"] / "ESCALATIONS.md"
     audit_path = paths["out"] / "audit_numbers.csv"
     terminology_path = paths["out"] / "terminology.csv"
+    bilingual_path = paths["out"] / "bilingual.csv"
 
     n_claims = build_filing(state, english_for, filing_path)
     build_side_by_side(state, english_for, flags_by_segment, sbs_path)
     build_escalations_md(state, escalations_path)
     build_audit_csv(state, audit_path)
+    n_bilingual = build_bilingual_csv(state, english_for, bilingual_path)
     shutil.copyfile(paths["terminology"], terminology_path)
     notes_path = copy_notes_for_reviewer(paths)
 
     n_segments = len(state["segments"]["segments"])
     reopen_and_assert(filing_path, sbs_path, n_claims, n_segments)
+    if n_bilingual != n_segments:
+        common.die(
+            f"acceptance failed: bilingual.csv has {n_bilingual} rows, "
+            f"expected {n_segments}"
+        )
 
     print("Assembled deliverables:")
-    written = [filing_path, sbs_path, escalations_path, audit_path, terminology_path]
+    written = [filing_path, sbs_path, escalations_path, audit_path, terminology_path,
+               bilingual_path]
     if notes_path is not None:
         written.append(notes_path)
     for path in written:

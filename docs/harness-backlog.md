@@ -119,6 +119,22 @@ must not appear, assert that every byte in the packet traces to a whitelisted
 source field. `pairs.json` already works that way by construction; the two copied
 files do not.
 
+## Nothing enforces re-verifying the `state/` digest at the close of the blind phase
+
+`review_packet.py build` prints `state_sha256`, and `state-digest` exists to
+re-read it non-destructively, but nothing requires the second call and no
+artifact records that it happened. On the cafe124 review it did not happen: the
+digest was printed at build time, the blind phase ran, and the first
+`set_final.py` write legitimately changed `state/` — after which the evidence for
+"nothing was written during the blind phase" no longer exists and cannot be
+reconstructed.
+
+The plan's own acceptance criterion asks for that hash to be unchanged, so this
+is a criterion the procedure gives no way to satisfy. `patent-review/SKILL.md`
+should end the blind phase with a `state-digest` call and have the reviewer
+record both digests in `REVIEW.md`; until it does, the property is asserted by
+smoke on the fixtures and unproven on every real run.
+
 ## No pre-commit enforcement
 
 `dev/smoke.py` and the documentation gate both have to be remembered. Optional
