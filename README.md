@@ -1,13 +1,10 @@
 # patent-translate
 
-Give it an Italian patent application. Get back the English version you can file
-as a PCT translation — plus a bilingual review document that shows, segment by
-segment, every choice that was made and every doubt that was left open. It runs
-as a **Claude Code skill**: you drop the Italian `.docx` into a folder, ask
-Claude to translate it, and answer its questions. Python scripts do the
-mechanical work — splitting the document, calling DeepL, running the
-verification battery, building the output files. Claude does the work that needs
-judgement — terminology, claims, fidelity review, flagging ambiguities.
+**Italian patent application in, English patent application out, ready to file.**
+
+You also get a bilingual document showing every choice and every open doubt,
+segment by segment. Drop the Italian `.docx` in a folder, ask Claude to
+translate it, answer its questions.
 
 ## What you get
 
