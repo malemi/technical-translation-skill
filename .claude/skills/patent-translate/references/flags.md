@@ -11,10 +11,14 @@
 - **TERM** — a terminology decision a reviewer might overturn (synonym
   choice, adapted-to vs configured-to, includente kept distinct…). One flag
   per decision, not per occurrence — the glossary already propagates it.
-- **CONVENTION** — a drafting rule applied and disclosed: said-policy,
-  two-part form kept, and one flag PER OCCURRENCE for transitional phrases in
-  claims. Not open doubts; they exist so the firm can reverse a rule with one
-  decision.
+- **CONVENTION** — a drafting rule applied and disclosed: said-policy, two-part
+  form kept, the transitional-phrase mapping. **One flag per RULE, never per
+  occurrence.** Not open doubts; they exist so the firm can reverse a rule with
+  one decision, and one decision needs one flag. They are an internal record:
+  they never reach the side-by-side, `ESCALATIONS.md` or the appendices. What a
+  human editor is told is `notes-for-human-reviewer.md`, which lists how a
+  handful of expressions were rendered — the Italian, the English, nothing else.
+  No reasons, no doubts, no "confirm".
 - **CLAIM-DEFECT** — the source claim is defective (antecedent missing in the
   Italian, claim term without description support, suspicious dependency,
   scope oddity). Translated faithfully; the flag describes the defect and,

@@ -10,6 +10,8 @@ and writes, into <project>/out/:
   ESCALATIONS.md      open non-convention flags, grouped by class
   audit_numbers.csv   the numbers-and-units audit table (checks data)
   terminology.csv     a copy of the project's glossary
+  notes-for-human-reviewer.md   copied from the project when it exists: how a
+                      handful of expressions were rendered, and nothing else
 
 This script never runs the checks: checks.py must have produced checks.json
 first. It fails loud on any missing required input.
@@ -21,6 +23,7 @@ import argparse
 import csv
 import re
 import shutil
+from pathlib import Path
 
 import common
 
@@ -31,8 +34,14 @@ APPENDIX_HEADINGS = (
     "Reference numeral map",
     "Claim dependency map",
     "Open escalations",
-    "Applied conventions",
 )
+
+# What a human editor is told about drafting conventions: notes-for-human-reviewer.md
+# and nothing else. CONVENTION flags are an internal record and are kept out of the
+# side-by-side, out of ESCALATIONS.md and out of the appendices — one per
+# occurrence of a transitional phrase put 18 rows of noise in cafe124's review
+# table, which is 18 more places for a reader to lose the findings that matter.
+NOTES_FOR_REVIEWER = "notes-for-human-reviewer.md"
 
 # Classes that escalate to ESCALATIONS.md (everything open except CONVENTION).
 ESCALATION_CLASSES = ("AMBIGUITY", "TERM", "CLAIM-DEFECT", "MECH")
@@ -190,8 +199,15 @@ def _set_landscape(doc) -> None:
 
 
 def _flag_lines(flags: list) -> list[str]:
+    """The review table's Flags column: everything except CONVENTION.
+
+    A CONVENTION flag is a rule we applied and disclosed, not a doubt. The
+    disclosure belongs in notes-for-human-reviewer.md, once per rule; repeating
+    it on every row it touches buries the flags that are actually questions.
+    """
     return [
-        f"⚑ {f['class']} — {f['issue']} [{f['status']}]" for f in flags
+        f"⚑ {f['class']} — {f['issue']} [{f['status']}]"
+        for f in flags if f["class"] != "CONVENTION"
     ]
 
 
@@ -342,19 +358,8 @@ def _append_appendices(doc, state: dict, flags_by_segment) -> None:
     else:
         doc.add_paragraph("None.", style="Normal")
 
-    # 5) Applied conventions (all CONVENTION flags).
-    doc.add_paragraph(APPENDIX_HEADINGS[4], style="Heading 2")
-    conventions = [
-        f for flags in flags_by_segment.values() for f in flags if f["class"] == "CONVENTION"
-    ]
-    if conventions:
-        for flag in conventions:
-            doc.add_paragraph(
-                f"{flag.get('segment_id', '?')}: {flag['issue']} [{flag['status']}]",
-                style="Normal",
-            )
-    else:
-        doc.add_paragraph("None.", style="Normal")
+    # There is deliberately no "Applied conventions" appendix. See
+    # NOTES_FOR_REVIEWER at the top of this module.
 
 
 # --------------------------------------------------------------------------
@@ -460,6 +465,25 @@ def reopen_and_assert(filing_path, sbs_path, n_claims: int, n_segments: int) -> 
 # entry point
 
 
+def copy_notes_for_reviewer(paths) -> Path | None:
+    """Copy <project>/notes-for-human-reviewer.md into out/, or None if absent.
+
+    Authored by the model, not generated: it is the one thing a human editor is
+    told about drafting conventions, and it says only how an expression was
+    rendered — the Italian, the English, nothing else. No reasons, no doubts, no
+    "confirm". A stale copy is worse than none, so an out/ copy left over from a
+    run where the project file has since been removed is deleted.
+    """
+    source = Path(paths["root"]) / NOTES_FOR_REVIEWER
+    target = paths["out"] / NOTES_FOR_REVIEWER
+    if not source.is_file():
+        if target.is_file():
+            target.unlink()
+        return None
+    shutil.copyfile(source, target)
+    return target
+
+
 def run(args) -> int:
     paths = common.project_paths(args.project, need_source=False)
     state = load_state(paths)
@@ -479,13 +503,19 @@ def run(args) -> int:
     build_escalations_md(state, escalations_path)
     build_audit_csv(state, audit_path)
     shutil.copyfile(paths["terminology"], terminology_path)
+    notes_path = copy_notes_for_reviewer(paths)
 
     n_segments = len(state["segments"]["segments"])
     reopen_and_assert(filing_path, sbs_path, n_claims, n_segments)
 
     print("Assembled deliverables:")
-    for path in (filing_path, sbs_path, escalations_path, audit_path, terminology_path):
+    written = [filing_path, sbs_path, escalations_path, audit_path, terminology_path]
+    if notes_path is not None:
+        written.append(notes_path)
+    for path in written:
         print(f"  {path}")
+    if notes_path is None:
+        print(f"  ({NOTES_FOR_REVIEWER} not authored for this project)")
     print(
         f"Acceptance OK: filing has CLAIMS heading + {n_claims} claims; "
         f"side-by-side rows = {n_segments} segments + 1 header."

@@ -51,6 +51,74 @@ responses once, replay them offline — rather than a mock, which would encode o
 assumptions about the API instead of its behaviour and would pass while the real
 call fails.
 
+## The reviewer's accuracy is not CI-assertable
+
+`dev/smoke.py` asserts everything mechanical about `patent-review` — packet shape,
+blindness against the project's own answer key, the validator's accept and reject
+vectors, the comparator's buckets, manifest↔style-guide consistency, and that all
+eight seeded judgement defects reach the packet. What it cannot assert is the only
+thing the skill exists for: whether the blind passes actually FIND those defects,
+and whether they invent findings that are not there. That is a model measurement —
+recall on `projects/_fixture_review`, precision and source-quirk recall on the
+clean `projects/_fixture` — so it costs a real run with real subagents and cannot
+sit in an offline test.
+
+Consequence: the numbers go stale silently. Changing the shard sizes, the prompt
+skeleton, the style guide or the session model can move recall without moving a
+single smoke assertion. The measurement has to be re-run deliberately and its
+result recorded in [quality-grades.md](quality-grades.md) with the date and the
+model it was measured on. There is no mechanical substitute; a cheaper proxy
+(keyword-matching a finding against the seed table) would grade the reviewer on
+vocabulary rather than on judgement, and would pass while the review got worse.
+
+## `review_sources.py check` — the network path — is not covered by the smoke test
+
+The edition check has two modes. `verify-manifest` is offline and fully asserted:
+smoke runs it against the tracked manifest and against three mutated copies (a
+bumped edition, a dropped entry, a moved URL), each of which must fail. `check` is
+the mode that actually fetches every manifest URL and looks for its
+`edition_token`, and `dev/smoke.py` is offline by design, so nothing exercises the
+fetch, the status handling, the token search, or the exit-3 contract that tells
+the reviewer to record the report verbatim and carry on.
+
+The failure this leaves open is a silent one: a token that no longer occurs on a
+page that has not moved would make every run report `MISSING` and every reviewer
+treat a healthy source as a moved one — or the reverse, a token so generic that it
+survives any edition bump and reports `OK` forever. Both are invisible offline.
+Same fix as the DeepL gap above: record the real responses once and replay them,
+rather than mock what we assume the pages return.
+
+## Nothing enforces blindness on the orchestrating session
+
+The packet enforces blindness on the *subagents*: their prompt names
+`<P>/review/packet/`, the builder decides what goes in it by whitelist, and a
+stray file in that directory now refuses the build. None of that constrains the
+session that orchestrates the review. It can read `state/flags.json` and paste it
+into a shard prompt, and no artefact would record that it did.
+
+`state_sha256` does not close this: it proves nothing was WRITTEN to `state/`
+during the blind phase and says nothing about reads. A read leaves no trace on
+disk, so there is probably no mechanical fix inside this repo's model — the honest
+position is that this half of decision 1 is policy, stated as such in
+`CONTRACTS.md` and in `patent-review/SKILL.md`, and that a run whose findings look
+suspiciously congruent with the pipeline's flags should be treated as suspect
+rather than as confirmation.
+
+## A permitted packet file with a new doubt-bearing field would leak again
+
+The blindness assertion and the FORBIDDEN list are both organised by FILE. That is
+what let the glossary's `flag` column through: `terminology.csv` is a permitted
+file, so nothing looked inside it. The specific hole is closed — the packet
+projects the glossary onto six columns and the withheld ones are in the answer-key
+scan — but the *shape* of the mistake is not. Add a `reviewer_note` column to
+`terminology.csv`, or a field to any structure the packet copies, and it reaches
+the reviewer with nothing objecting.
+
+What would actually fix it is inverting the assertion: instead of listing what
+must not appear, assert that every byte in the packet traces to a whitelisted
+source field. `pairs.json` already works that way by construction; the two copied
+files do not.
+
 ## No pre-commit enforcement
 
 `dev/smoke.py` and the documentation gate both have to be remembered. Optional

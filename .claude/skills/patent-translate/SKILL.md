@@ -45,6 +45,15 @@ Work from the repo root. `<P>` = project path, e.g. `projects/acme`.
 
 ### 0. Preflight
 - Exactly one `.docx` in `<P>` (else pass `--source`).
+- A legacy binary `.doc` source must be converted first — python-docx cannot
+  read OLE2: `.venv/bin/python $S/dev/convert_doc.py --project <P>
+  [--source name.doc] [--force]`. It uses LibreOffice headless (plain-text
+  extractors destroy the paragraph structure the pipeline segments on), writes
+  `source.docx` beside the `.doc`, refuses to overwrite an existing
+  `source.docx` without `--force`, and never deletes the original — the `.doc`
+  stays the authoritative artifact. Conversion is lossy in principle: check
+  ingest's printed summary (paragraph counts, headings, claims, reference
+  signs) against the `.doc` before trusting it.
 - `DEEPL_AUTH_KEY` reachable (env or repo `.env`). Never echo it.
 
 ### 1. Ingest
@@ -108,6 +117,13 @@ Work from the repo root. `<P>` = project path, e.g. `projects/acme`.
   flag.
 
 ### 8. Assemble and deliver
+- Write `<P>/notes-for-human-reviewer.md`: a table of how expressions were
+  rendered in THIS application — Italian, English, and nothing else. No reasons,
+  no doubts, no "confirm", no rule citations. Include a pattern only if a human
+  editor would want it; a couple of dozen rows, not the whole glossary. Close
+  with at most three plain lines on what follows the Italian as filed (claim
+  form and dependencies, decimal points, reference signs unchanged).
+  Less is more: everything you add is another thing to lose the real findings in.
 - `.venv/bin/python $S/assemble.py run --project <P>`
 - Report to Mario (Italian): `out/` paths, open escalations by class,
   multiple-dependent claims (US-phase note, from the claims_graph data),

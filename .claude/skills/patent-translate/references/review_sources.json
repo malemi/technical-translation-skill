@@ -1,0 +1,98 @@
+{
+  "sources": [
+    {
+      "id": "pct-articles",
+      "name": "Patent Cooperation Treaty (Articles)",
+      "url": "https://www.wipo.int/en/web/pct-system/texts/articles/atoc",
+      "edition_token": "as in force from April 1, 2002",
+      "style_guide_url": "https://www.wipo.int/documents/d/pct-system/docs-en-texts-pct.pdf",
+      "style_guide_edition": null,
+      "note": "The guide cites the PDF, so this fetches the WIPO HTML table of contents of the Treaty, which states the in-force date in its heading. The guide's own \"(in force 1 January 2026)\" belongs to the Regulations, not to the Treaty text, which has stood unchanged since 1 April 2002: hence no style_guide_edition here."
+    },
+    {
+      "id": "pct-regulations",
+      "name": "Regulations under the PCT",
+      "url": "https://www.wipo.int/en/web/pct-system/texts/rules/rtoc1",
+      "edition_token": "(as in force from January 1, 2026)",
+      "style_guide_url": "https://www.wipo.int/documents/d/pct-system/docs-en-texts-pct-regs.pdf",
+      "style_guide_edition": "in force 1 January 2026",
+      "note": "The HTML table of contents of the Regulations carries the edition in its own heading, so the token is specific to this text: the same date on the WIPO index page is shared with the Administrative Instructions and the ISPE Guidelines and would stay present after a Regulations amendment. The parentheses are part of the token for that reason."
+    },
+    {
+      "id": "pct-ispe-guidelines",
+      "name": "PCT International Search and Preliminary Examination Guidelines",
+      "url": "https://www.wipo.int/en/web/pct-system/texts/ispe/index",
+      "edition_token": "as in force from January 1, 2026",
+      "style_guide_url": "https://www.wipo.int/documents/d/pct-system/docs-en-texts-ispe.pdf",
+      "style_guide_edition": "PCT/GL/ISPE/14, 12 December 2025",
+      "note": "The document code PCT/GL/ISPE/14 appears only inside the PDF, never on the HTML page, so the token is the in-force date of that same edition: ISPE/14 is the text in force from 1 January 2026, superseding ISPE/13 (in force until 31 December 2025). A new edition changes this heading."
+    },
+    {
+      "id": "pct-applicants-guide",
+      "name": "PCT Applicant's Guide, International Phase",
+      "url": "https://www.wipo.int/en/web/pct-system/guide/index",
+      "edition_token": "docs-en-guide-gdvol1.pdf",
+      "style_guide_url": "https://www.wipo.int/documents/d/pct-system/docs-en-guide-gdvol1.pdf",
+      "style_guide_edition": null,
+      "note": "Weak token, deliberately. The Applicant's Guide carries no edition at all: WIPO states on this page that it is updated virtually every week. The token is therefore the cited PDF's own path as published on that page, and this entry is a link-liveness check rather than an edition check: it fires when the guide's link stops being the current International Phase volume."
+    },
+    {
+      "id": "epc-article-84",
+      "name": "EPC Article 84",
+      "url": "https://www.epo.org/en/legal/epc/2020/a84.html",
+      "edition_token": "clear and concise and be supported by the description",
+      "style_guide_edition": null,
+      "note": "The EPC page carries no edition marker, so the token is the provision the guide quotes under Clarity. Its absence means either that Article 84 was amended or that the page moved, and both cases require the normative layer to be re-read."
+    },
+    {
+      "id": "epc-rule-43",
+      "name": "EPC Rule 43",
+      "url": "https://www.epo.org/en/legal/epc/2020/r43.html",
+      "edition_token": "These reference signs shall not be construed as limiting the claim",
+      "style_guide_edition": null,
+      "note": "Same reasoning as epc-article-84: the token is the sentence of Rule 43(7) the guide quotes, which is what \"reference signs are copied character for character\" rests on."
+    },
+    {
+      "id": "epo-guidelines-f-ii",
+      "name": "EPO Guidelines for Examination, Part F, Chapter II",
+      "url": "https://www.epo.org/en/legal/guidelines-epc",
+      "edition_token": "The April 2026 edition entered into force on 1 April 2026",
+      "style_guide_url": "https://www.epo.org/en/legal/guidelines-epc/2026/f_ii.html",
+      "style_guide_edition": "April 2026",
+      "note": "This is the entry that detects a new Guidelines edition, for Part F and Part G alike. The guide cites year-pinned chapter URLs, which the EPO archives permanently: a 2026 page can never report that a 2027 edition exists. The unpinned Guidelines landing page states which edition is in force, so it is fetched here instead."
+    },
+    {
+      "id": "epo-guidelines-f-iv",
+      "name": "EPO Guidelines for Examination, Part F, Chapter IV",
+      "url": "https://www.epo.org/en/legal/guidelines-epc/2026/f_iv_4_20.html",
+      "edition_token": "no further features are present in the apparatus/method/product apart from the ones following said wording",
+      "style_guide_url": "https://www.epo.org/en/legal/guidelines-epc/2026/f_iv.html",
+      "style_guide_edition": "April 2026",
+      "note": "The chapter page carries navigation only; the text lives in the section pages. F-IV, 4.20 is the load-bearing citation of this chapter (transitional phrases and the T 759/10 added-matter trap), so the token is the sentence the guide quotes there. This is a content-fidelity check of a year-pinned page; edition currency is watched by epo-guidelines-f-ii."
+    },
+    {
+      "id": "epo-guidelines-g-vi",
+      "name": "EPO Guidelines for Examination, Part G, Chapter VI",
+      "url": "https://www.epo.org/en/legal/guidelines-epc/2026/g_vi.html",
+      "edition_token": "2. Implicit features or well-known equivalents",
+      "style_guide_edition": null,
+      "note": "The guide lists this chapter as read but quotes nothing from it, so there is no sentence to pin. The token is one of its section titles, which the EPO renumbers and retitles between editions; on a year-pinned page it verifies that the cited chapter still resolves with the structure that was read. Edition currency: epo-guidelines-f-ii."
+    },
+    {
+      "id": "mpep",
+      "name": "MPEP, Manual of Patent Examining Procedure",
+      "url": "https://www.uspto.gov/web/offices/pac/mpep/index.html",
+      "edition_token": "Ninth Edition, Revision 01.2024",
+      "style_guide_edition": null,
+      "note": "The MPEP index page states the current revision in its own heading, and a new revision replaces that string. The guide cites MPEP sections for US-phase flags only, so a firing check here changes flags, never the English."
+    },
+    {
+      "id": "cfr-37-1-75",
+      "name": "37 CFR 1.72 and 1.75 (Cornell LII text)",
+      "url": "https://www.law.cornell.edu/cfr/text/37/1.75",
+      "edition_token": "Oct. 14, 2009]",
+      "style_guide_edition": null,
+      "note": "Cornell LII closes the rule with its Federal Register amendment history; the closing bracket is inside the token, so a further amendment to 37 CFR 1.75 removes it. The guide records that the official eCFR page was unreachable and that this text was used instead, which is also why the URL is a third-party mirror."
+    }
+  ]
+}

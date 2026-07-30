@@ -4,6 +4,7 @@ projects/*
 projects/_fixture/state/
 projects/_fixture/work/
 projects/_fixture/out/
+projects/_fixture/review/
 projects/_fixture/source.docx
 
 .env

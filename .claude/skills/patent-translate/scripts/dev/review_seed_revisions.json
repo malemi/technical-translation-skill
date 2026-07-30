@@ -1,0 +1,206 @@
+{
+  "seeds": [
+    {
+      "seed": 1,
+      "mode": "means-to-mechanism",
+      "summary": "'means' rewritten as 'mechanism', with the plural silently made singular",
+      "catalogue": "`mezzi` rewritten as `mechanism`, and the plural silently made singular.",
+      "rule": "style-guide, Never negotiable: \"`mezzi` -> `means`, always. Never `mechanism`, `device`, `unit`, `system`, `assembly`. Keep the plural agreement\"; consistency is normative, PCT Rule 10.2",
+      "segment_id": "D-0002",
+      "target": "pair",
+      "text_it_fragment": "Tali sistemi presentano tuttavia consumi energetici elevati",
+      "changes": [
+        {
+          "before": "However, such systems have high energy consumption",
+          "after": "However, such a mechanism has high energy consumption"
+        }
+      ],
+      "mechanical_check": null,
+      "note": "The fixture Italian contains no `mezzi`, so the catalogue trigger word cannot be reproduced verbatim on the English side. The seed reproduces both halves of the mode on the nearest available noun: the mandated rendering of `sistemi` is replaced by the forbidden `mechanism`, and the plural is silently made singular (verb agreement follows). The first sentence of the same paragraph keeps 'systems', so the substitution also breaks intra-paragraph term consistency."
+    },
+    {
+      "seed": 2,
+      "mode": "reference-sign-relettered",
+      "summary": "a reference sign re-lettered to suit English word order",
+      "catalogue": "A two-letter reference sign re-lettered to match English word order.",
+      "rule": "style-guide, Never negotiable: \"Reference signs are copied character for character. Same characters, same order, same parentheses, attached to the same noun\"; EPC Rule 43(7)",
+      "segment_id": "D-0006",
+      "target": "pair",
+      "text_it_fragment": "un supporto (3a) removibile",
+      "changes": [
+        {
+          "before": "a removable support (3a)",
+          "after": "a removable support (3b)"
+        }
+      ],
+      "mechanical_check": "numerals_per_segment",
+      "note": "The fixture has no two-letter sign; its only lettered sign is the suffixed `(3a)`. Any character-level re-lettering changes the reference-sign multiset, so this is the one seed a mechanical check would also catch. checks.py is not run on this fixture, and the reviewer never sees checks.json, so it still measures reviewer recall — it just is not exclusive to the reviewer."
+    },
+    {
+      "seed": 3,
+      "mode": "dropped-clause",
+      "summary": "a subordinate clause dropped while making the sentence read better",
+      "catalogue": "A sentence dropped, and two defined quantities altered, while making a paragraph read better.",
+      "rule": "style-guide, Never negotiable: \"Nothing is dropped. Not a sentence, not a subordinate clause\"; Adjudicating a review comment, Q1",
+      "segment_id": "D-0001",
+      "target": "pair",
+      "text_it_fragment": "nonché un metodo di estrazione impiegante tale apparecchiatura",
+      "changes": [
+        {
+          "before": "of coffee, as well as a method of extraction using said apparatus.",
+          "after": "of coffee."
+        }
+      ],
+      "mechanical_check": null,
+      "note": "The dropped clause carries no reference sign, number or unit, so no mechanical check reacts: the whole second half of the sentence — the method the application also claims — is simply absent from the English."
+    },
+    {
+      "seed": 4,
+      "mode": "altered-defined-quantity",
+      "summary": "a defined quantity altered: the operands of a ratio are exchanged",
+      "catalogue": "A sentence dropped, and two defined quantities altered, while making a paragraph read better.",
+      "rule": "style-guide, Never negotiable: \"Defined quantities keep their structure. A ratio stays that ratio with those operands\"",
+      "segment_id": "D-0009",
+      "target": "pair",
+      "text_it_fragment": "la percentuale di caffè macinato rispetto all'acqua",
+      "changes": [
+        {
+          "before": "the ratio of ground coffee to water",
+          "after": "the ratio of water to ground coffee"
+        }
+      ],
+      "mechanical_check": null,
+      "note": "The numbers and the unit are untouched, so numbers_units stays clean: only the operands of the ratio are exchanged, which inverts the disclosed mixture (5% to 12.5% of coffee in water becomes 5% to 12.5% of water in coffee)."
+    },
+    {
+      "seed": 5,
+      "mode": "gerunds-to-imperatives",
+      "summary": "method steps converted from gerunds to imperatives",
+      "catalogue": "Method steps converted from gerunds to imperatives.",
+      "rule": "style-guide, Claim structure: \"infinitives become gerunds (`introdurre` -> `introducing`). Gerunds in the claims, the description and the abstract alike — never the imperative\"",
+      "segment_id": "C-06",
+      "target": "claim",
+      "text_it_fragment": "comprendente le fasi di",
+      "changes": [
+        {
+          "before": "introducing water and ground coffee into the extraction tank (2);",
+          "after": "introduce water and ground coffee into the extraction tank (2);"
+        },
+        {
+          "before": "circulating the water by means of the recirculation pump (4)",
+          "after": "circulate the water by means of the recirculation pump (4)"
+        },
+        {
+          "before": "maintaining the temperature between 4 °C and 8 °C.",
+          "after": "maintain the temperature between 4 °C and 8 °C."
+        }
+      ],
+      "mechanical_check": null,
+      "note": "All three steps of the only method claim, so the defect is a pattern and not a slip. The preamble keeps 'comprising the steps of:', which now governs three imperatives."
+    },
+    {
+      "seed": 6,
+      "mode": "by-way-of",
+      "summary": "'by way of' introduced as a rendering of 'mediante'",
+      "catalogue": "`by way of` introduced throughout as a rendering of `mediante`.",
+      "rule": "style-guide, Standard renderings: `mediante` (description) -> `by`, not `by way of`; \"`by way of` is wrong as a rendering of `mediante`\"",
+      "segment_id": "D-0002",
+      "target": "pair",
+      "text_it_fragment": "Sono noti sistemi per la preparazione di caffè mediante estrazione a freddo",
+      "changes": [
+        {
+          "before": "Systems for preparing coffee by cold extraction are known",
+          "after": "Systems for preparing coffee by way of cold extraction are known"
+        }
+      ],
+      "mechanical_check": null,
+      "note": "D-0002 is the only description segment whose Italian uses `mediante` (the other occurrences are in claim 6, where the preamble rendering `by means of` is the house choice). This seed and seed 1 therefore share a segment, in different sentences of it."
+    },
+    {
+      "seed": 7,
+      "mode": "closed-transition",
+      "summary": "a closed transition ('consisting of') where the Italian transition is open",
+      "catalogue": null,
+      "rule": "style-guide, Transitional phrases (scope-critical — never smooth): `comprendente` -> `comprising`; added-matter trap, \"'comprising' does not provide per se an implicit basis for either 'consisting of' or 'consisting essentially of' (T 759/10)\" — EPO Guidelines F-IV, 4.20",
+      "segment_id": "C-01",
+      "target": "claim",
+      "text_it_fragment": "Apparecchiatura (1) per l'estrazione a freddo di caffè, comprendente:",
+      "changes": [
+        {
+          "before": "for the cold extraction of coffee, comprising:",
+          "after": "for the cold extraction of coffee, consisting of:"
+        }
+      ],
+      "mechanical_check": null,
+      "note": "Seeded in the independent claim, where the added-matter trap bites: the closed transition cannot later be reopened. The characterising portion still reads 'further comprises', so the claim now contradicts its own preamble."
+    },
+    {
+      "seed": 8,
+      "mode": "dropped-hedge",
+      "summary": "a hedge dropped: 'preferibilmente' present in the Italian, absent in the English",
+      "catalogue": null,
+      "rule": "style-guide, Forbidden: \"Adding hedges not in the Italian, or dropping ones that are there\"; Standard renderings: `preferibilmente` -> `preferably`, \"Hedges present in the Italian are present in the English\"",
+      "segment_id": "D-0007",
+      "target": "pair",
+      "text_it_fragment": "preferibilmente pari a 2,5 bar",
+      "changes": [
+        {
+          "before": "12.5 bar, preferably 2.5 bar.",
+          "after": "12.5 bar, equal to 2.5 bar."
+        }
+      ],
+      "mechanical_check": null,
+      "note": "The only `preferibilmente` in the fixture, and the fixture has no `sostanzialmente`. The numbers and units are untouched, so numbers_units stays clean: what changes is that a preferred value now reads as the operating value."
+    }
+  ],
+  "pairs": [
+    {
+      "id": "D-0001",
+      "text_en": "The present invention relates to an apparatus for the cold extraction of coffee.",
+      "reason": "seed 3 (dropped-clause): the clause rendering 'nonché un metodo di estrazione impiegante tale apparecchiatura' is dropped"
+    },
+    {
+      "id": "D-0002",
+      "text_en": "Systems for preparing coffee by way of cold extraction are known, in which ground coffee is placed in contact with water at room temperature for extraction times typically ranging from 12 to 24 hours. However, such a mechanism has high energy consumption and limited aromatic yield. Furthermore, the aromatic yield is difficult to control.",
+      "reason": "seeds 1 (means-to-mechanism) and 6 (by-way-of): 'systems' replaced by singular 'mechanism', and 'mediante' rendered 'by way of'"
+    },
+    {
+      "id": "D-0006",
+      "text_en": "The filter assembly (3) comprises a metal mesh with 100 µm mesh size and a removable support (3b).",
+      "reason": "seed 2 (reference-sign-relettered): reference sign (3a) re-lettered to (3b)"
+    },
+    {
+      "id": "D-0007",
+      "text_en": "The recirculation pump (4) is configured to operate at a pressure between 0.5 bar and 12.5 bar, equal to 2.5 bar.",
+      "reason": "seed 8 (dropped-hedge): the hedge 'preferibilmente' is dropped"
+    },
+    {
+      "id": "D-0009",
+      "text_en": "In a preferred embodiment, the ratio of water to ground coffee is between 5% and 12.5% by weight.",
+      "reason": "seed 4 (altered-defined-quantity): the operands of the ratio are exchanged"
+    }
+  ],
+  "claims": [
+    {
+      "id": "C-01",
+      "parts_en": [
+        "1. Apparatus (1) for the cold extraction of coffee, consisting of:",
+        "an extraction tank (2) adapted to contain water and ground coffee;",
+        "a filter assembly (3) arranged inside the extraction tank (2);",
+        "a recirculation pump (4) configured to circulate the water through the filter assembly (3);",
+        "characterized in that it further comprises a control unit (5) configured to maintain the temperature of the water between 4 °C and 8 °C."
+      ],
+      "reason": "seed 7 (closed-transition): open 'comprendente' rendered with the closed 'consisting of'"
+    },
+    {
+      "id": "C-06",
+      "parts_en": [
+        "6. A method for the cold extraction of coffee by means of an apparatus according to any one of the preceding claims, comprising the steps of:",
+        "introduce water and ground coffee into the extraction tank (2);",
+        "circulate the water by means of the recirculation pump (4) for a time of at least 20 minutes;",
+        "maintain the temperature between 4 °C and 8 °C."
+      ],
+      "reason": "seed 5 (gerunds-to-imperatives): the three method steps become imperatives"
+    }
+  ]
+}

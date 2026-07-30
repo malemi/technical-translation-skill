@@ -1,8 +1,10 @@
 # technical-translation-skill — index
 
-A single Claude Code skill, `patent-translate`, that turns an Italian patent
-application into an English one for a PCT filing. Deterministic Python scripts do
-everything mechanical; the model does everything judgmental at skill run time.
+Two Claude Code skills over one pipeline. `patent-translate` turns an Italian
+patent application into an English one for a PCT filing; `patent-review` reviews a
+finished job blind, the way an independent reviewer would. Deterministic Python
+scripts do everything mechanical; the model does everything judgmental at skill
+run time.
 
 This is a **leaf** repo — no sub-repos are checked out under it.
 
@@ -10,12 +12,13 @@ This is a **leaf** repo — no sub-repos are checked out under it.
 
 | Path | Role |
 | --- | --- |
-| `.claude/skills/patent-translate/SKILL.md` | The entry point. The model follows this to run a job. |
-| `.claude/skills/patent-translate/references/` | Claim conventions, flag classes, review protocol. |
-| `.claude/skills/patent-translate/scripts/` | The deterministic pipeline (ingest, glossary, DeepL, checks, assemble). |
+| `.claude/skills/patent-translate/SKILL.md` | Entry point for a translation job. The model follows this to run one. |
+| `.claude/skills/patent-review/SKILL.md` | Entry point for the blind independent review of a finished job. Holds nothing else. |
+| `.claude/skills/patent-translate/references/` | The style guide (the single style authority), flag classes, review protocol, edition manifest. |
+| `.claude/skills/patent-translate/scripts/` | The deterministic pipeline (ingest, glossary, DeepL, checks, assemble) plus the four `review_*.py` scripts the reviewer runs — they live here to share `common.py`. |
 | [`CONTRACTS.md`](CONTRACTS.md) | The build contract: state schemas, module contracts, global policies. Authoritative when code and prose disagree. |
 | [`README.md`](README.md) | What this is and how to try it. Start here if you have never run it. |
-| `projects/<slug>/` | One directory per document job. **Never committed.** |
+| `projects/<slug>/` | One directory per document job, its `review/` included. **Never committed.** |
 
 ## Verifying the pipeline
 
@@ -26,9 +29,10 @@ One command, offline, no DeepL key:
 ```
 
 It runs the whole chain on the fixtures and asserts the outcome at both ends —
-the clean fixture's 13 check statuses, and all six seeded defects in the
-corrupted copy. Exit 0 means the pipeline still works. Run it after touching
-anything under `scripts/`.
+the clean fixture's 13 check statuses, all six seeded defects in the corrupted
+copy, and the review module's mechanical layer (packet shape, blindness,
+validator and comparator vectors, manifest consistency). Exit 0 means the
+pipeline still works. Run it after touching anything under `scripts/`.
 
 ## Documentation
 
